@@ -1,2 +1,2 @@
 # SimpleUsers
-Mongodb+Express+AngularJs+NodeJs
+SimpleUsers
