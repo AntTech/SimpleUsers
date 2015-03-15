@@ -10,9 +10,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-app.get('/userlist/userlist', routes.list);
-app.get('/userInfo/:id', routes.getUserInfo);
-app.post('/userInfo', routes.createUserInfo);
 
 app.set('port', process.env.PORT || 3001);
 // view engine setup
@@ -27,6 +24,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'app')));
 
+
+app.get('/userlist/:id', routes.list);
+app.get('/userInfo/:id', routes.getUserInfo);
+app.post('/userInfo', routes.createUserInfo);
+app.post('/userInfo/:id', routes.updateUserInfo);
+app.delete('/deleteUser', routes.deleteUserInfo);
 
 // catch 404 and forward to error handler
 

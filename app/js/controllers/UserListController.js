@@ -2,8 +2,8 @@
  * Created by yangzx on 3/13/2015.
  */
 'use strict';
-var userListModule = angular.module("userListModule", ['ngResource','userServices']);
-userListModule.controller('UserListController',function($scope, $http, $state, $stateParams,UserInfoService,$resource){
+var userListModule = angular.module("userListModule", ['ngResource', 'userServices']);
+userListModule.controller('UserListController', function($scope, $http, $state, $stateParams, $resource, UserInfoService) {
     console.log("start controller");
     $scope.filterOptions = {
         filterText: "",
@@ -26,35 +26,45 @@ userListModule.controller('UserListController',function($scope, $http, $state, $
             $scope.$apply();
         }
     };
+    $scope.searchText = function(){
+        $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage,$scope.searchName);
+    }
     $scope.getPagedDataAsync = function(pageSize, page, searchText) {
         setTimeout(function() {
             var data;
             if (searchText) {
                 var ft = searchText.toLowerCase();
-                $http.get('../data/userlist.json')
-                    .success(function(largeLoad) {
-                        data = largeLoad.filter(function(item) {
-                            return JSON.stringify(item).toLowerCase().indexOf(ft) != -1;
-                        });
-                        $scope.setPagingData(data, page, pageSize);
-                    });
+                UserInfoService.query({
+                        userId: "userlist",
+                        userName: searchText
+                    })
+                    .$promise.then(
+                        //success
+                        function(value) {
+                            var data = value.filter(function(item) {
+                                return JSON.stringify(item).toLowerCase().indexOf(ft) != -1;
+                            });
+                            $scope.setPagingData(data, page, pageSize);
+                        },
+                        //error
+                        function(error) {
+                            alert('获取数据失败');
+                        }
+                    );
             } else {
-
-                //$scope.setPagingData(allUsers, page, pageSize);
-                //var userInfo = allUsers.get();
-                //var User = $resource('/user/:userId', {userId:'@id'});
-                //user.id = 25;
-                //user.firstname = $scope.firstname;
-                //user.lastname = $scope.lastname;
-                //user.address = $scope.address;
-                //user.email = $scope.email;
-                //user.$save(function(response){
-                //$scope.message = response.message;
-                //});
-                //$scope.userList.push(userInfo);
-                $scope.userList = UserInfoService.query({userId: "userlist"});
-
-                //$scope.userList =userlist;
+                UserInfoService.query({
+                        userId: "userlist"
+                    })
+                    .$promise.then(
+                        //success
+                        function(value) {
+                            $scope.setPagingData(value, page, pageSize);
+                        },
+                        //error
+                        function(error) {
+                            alert('获取数据失败');
+                        }
+                    );
 
             }
         }, 100);
@@ -74,7 +84,7 @@ userListModule.controller('UserListController',function($scope, $http, $state, $
 
     $scope.gridOptions = {
         data: 'userList',
-        rowTemplate: '<div style="height: 100%">'+
+        rowTemplate: '<div style="height: 100%">' +
             '<div ng-style="{ \'cursor\': row.cursor }" ng-repeat="col in renderedColumns" ng-class="col.colIndex()" class="ngCell ">' +
             '<div class="ngVerticalBar" ng-style="{height: rowHeight}" ng-class="{ ngVerticalBarVisible: !$last }"> </div>' +
             '<div ng-cell></div>' +
@@ -120,19 +130,30 @@ userListModule.controller('UserListController',function($scope, $http, $state, $
             field: 'Address',
             displayName: '地址',
             enableCellEdit: true,
-            width: 280
+            width: 250
         }, {
             field: 'UserId',
             displayName: '操作',
             enableCellEdit: false,
             sortable: false,
             pinnable: false,
-            cellTemplate: '<div><a ui-sref="userInfo({userId:row.getProperty(col.field)})" id="{{row.getProperty(col.field)}}">编辑</a></div>'
+            cellTemplate: '<div><a ui-sref="updateUser({userId:row.getProperty(col.field)})" id="{{row.getProperty(col.field)}}">编辑</a>&nbsp;<a ui-sref="userInfo({userId:row.getProperty(col.field)})" id="{{row.getProperty(col.field)}}">查看</a>&nbsp;<a ng-click="deleteUser(row.getProperty(col.field))">删除</a></div>'
         }],
         enablePaging: true,
         showFooter: true,
         totalServerItems: 'totalServerItems',
         pagingOptions: $scope.pagingOptions,
         filterOptions: $scope.filterOptions
+    };
+    $scope.deleteUser = function(userid) {
+        //删除用户操作
+        if (confirm('确定要删除吗？')) {
+            console.log("删除" + userid);
+            var user = $resource('/deleteUser',{UserId:userid});
+            user.delete({UserId:userid},function(){
+                alert('删除成功');
+                $scope.getPagedDataAsync($scope.pagingOptions.pageSize, $scope.pagingOptions.currentPage);
+            })
+        };
     };
 });

@@ -3,7 +3,7 @@
  */
 
 'use strict';
-var routerApp = angular.module('routerApp', ['ui.router','ngResource', 'ngGrid', 'userListModule']);
+var routerApp = angular.module('routerApp', ['ui.router','ngResource', 'ngGrid', 'userListModule','userInfoModule']);
 
 console.log("start app");
 
@@ -13,11 +13,11 @@ routerApp.run(function($rootScope, $state, $stateParams) {
 });
 
 routerApp.config(['$stateProvider','$urlRouterProvider',function($stateProvider, $urlRouterProvider) {
-    $urlRouterProvider.otherwise('/index');
+    $urlRouterProvider.otherwise('/login');
     console.log("start router start");
     $stateProvider
         .state('index',{
-            url: '/index',
+            url: '/login',
             views: {
                 '': {
                     templateUrl: 'tpl/home.html'
@@ -28,7 +28,7 @@ routerApp.config(['$stateProvider','$urlRouterProvider',function($stateProvider,
             }
         })
         .state('main',{
-            url: '/',
+            url: '/index',
             views:{
                 '':{
                     templateUrl:'tpl/userList.html'
@@ -51,6 +51,6 @@ routerApp.config(['$stateProvider','$urlRouterProvider',function($stateProvider,
         })
         .state('updateUser',{
             url: '/updateUser/:userId',
-            templateUrl:'tpl/addUserForm.html'
+            templateUrl:'tpl/updateUserForm.html'
         });
 }]);
