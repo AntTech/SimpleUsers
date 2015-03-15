@@ -28,7 +28,7 @@ userInfoModule.controller('NewUserInfoCtrl', function($scope, $state, $statePara
    		user.save(userModel, function(doc){
 			console.log(doc);
 			alert('保存成功！');
-			location.href="#/";
+			location.href="#/index";
    		});
 
 	};
@@ -55,7 +55,7 @@ userInfoModule.controller('UpdateUserInfoCtrl', function($scope, $state, $stateP
    		user.save(userModel, function(doc){
 			console.log(doc);
 			alert('保存成功！');
-			location.href="#/";
+			location.href="#/index";
    		});
 
 		console.log($scope.userModel);
